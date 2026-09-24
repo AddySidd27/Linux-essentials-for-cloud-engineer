@@ -248,7 +248,7 @@ sudo journalctl -u sshd --since "1 hour ago"     # Red Hat family (service is ss
 
 1. Create a user `devops1` with a home directory and bash.
 2. Create a group `ops` and add `devops1` to it.
-3. Allow the `ops` group to run only `systemctl restart nginx` and `journalctl` with sudo.
+3. Allow the `ops` group to run only `systemctl restart nginx` and `journalctl` with sudo, without a password (`devops1` logs in with a key and has no password).
 4. Add an SSH public key for `devops1` (generate one with `ssh-keygen -t ed25519 -f /tmp/devops1` for the lab).
 5. Log in as `devops1` and confirm what sudo allows.
 6. Offboard `devops1`: lock, block login, disable the key, end sessions.
@@ -257,7 +257,7 @@ sudo journalctl -u sshd --since "1 hour ago"     # Red Hat family (service is ss
 sudo useradd -m -s /bin/bash devops1
 sudo groupadd ops
 sudo usermod -aG ops devops1
-echo '%ops ALL=(root) /usr/bin/systemctl restart nginx, /usr/bin/journalctl' | sudo tee /etc/sudoers.d/ops
+echo '%ops ALL=(root) NOPASSWD: /usr/bin/systemctl restart nginx, /usr/bin/journalctl' | sudo tee /etc/sudoers.d/ops
 sudo chmod 440 /etc/sudoers.d/ops
 sudo visudo -c
 
@@ -265,17 +265,22 @@ ssh-keygen -t ed25519 -f /tmp/devops1 -N ""
 sudo install -d -m 700 -o devops1 -g devops1 /home/devops1/.ssh
 sudo install -m 600 -o devops1 -g devops1 /tmp/devops1.pub /home/devops1/.ssh/authorized_keys
 
-ssh -i /tmp/devops1 devops1@localhost 'sudo -l'
+ssh -i /tmp/devops1 devops1@localhost 'sudo -l; sudo systemctl restart nginx && echo restarted'
 ```
 
 Output of the last command (example):
 
 ```text
 User devops1 may run the following commands on web01:
-    (root) /usr/bin/systemctl restart nginx, /usr/bin/journalctl
+    (root) NOPASSWD: /usr/bin/systemctl restart nginx, /usr/bin/journalctl
+restarted
 ```
 
 `install -d` creates a directory with the owner and mode in one step. `install -m` copies a file with the owner and mode in one step.
+
+> Without `NOPASSWD:`, sudo asks `devops1` for a password, and a key-only user has none, so every sudo command fails with `sudo: a password is required`. Either keep `NOPASSWD:` limited to specific commands, as here, or set a password with `sudo passwd devops1`.
+
+Try a command that is not in the rule: `ssh -i /tmp/devops1 devops1@localhost 'sudo cat /etc/shadow'`. sudo asks for a password, and the user cannot run it.
 
 Now offboard and confirm the key no longer works:
 
@@ -299,6 +304,8 @@ devops1@localhost: Permission denied (publickey).
 | New group membership not working | Groups load at login. | Log out and back in, or `newgrp <group>`. |
 | `sudo: parse error in /etc/sudoers.d/...` | File was edited without `visudo`. | Fix with `pkexec visudo` if available, or use the cloud recovery tools in Chapters 19 and 20. |
 | SSH key login refused for a new user | Wrong owner or permissions on `.ssh`. | `chown -R user:user ~user/.ssh`, `chmod 700` directory, `chmod 600` file. |
+| `sudo: a password is required` | The rule needs a password and the user has none (key-only login). | Set a password with `passwd`, or use `NOPASSWD:` for specific commands. |
+| `sudo: unable to resolve host web01` | The hostname is missing from `/etc/hosts`, often after renaming the server. | Add `127.0.1.1 web01` to `/etc/hosts`. |
 
 ## Next
 

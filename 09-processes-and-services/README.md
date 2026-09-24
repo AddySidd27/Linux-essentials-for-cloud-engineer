@@ -114,6 +114,8 @@ Read it top to bottom:
 - The last lines are the most recent log messages. For more: `journalctl -u nginx -n 50`.
 
 > Service names differ by distribution. The SSH server is `ssh` on Ubuntu and `sshd` on Red Hat family. The Apache web server is `apache2` on Ubuntu and `httpd` on Red Hat family.
+>
+> On Ubuntu 24.04, SSH is **socket-activated**: `ssh.socket` listens on port 22 and starts `ssh.service` on the first connection. Right after boot, `systemctl is-active ssh` can say `inactive` while SSH works fine. Check `systemctl status ssh.socket` instead.
 
 ## Unit files
 
@@ -147,12 +149,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b"myapp is running\n")
+socketserver.TCPServer.allow_reuse_address = True
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print(f"listening on {PORT}", flush=True)
     httpd.serve_forever()
 EOF
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin myapp 2>/dev/null || true
 ```
+
+The `allow_reuse_address` line lets the app bind to port 8080 again straight after a crash. Without it, a restart within about a minute fails with `Address already in use`, because the old connections are still closing.
 
 **2. The unit file**
 
@@ -209,14 +214,26 @@ myapp is running
 
 **4. Test automatic restart**
 
+Simulate a crash by killing the process with `SIGKILL`:
+
 ```bash
-sudo pkill -f /opt/myapp/app.py
+sudo pkill -9 -f /opt/myapp/app.py
 sleep 6
-systemctl status myapp --no-pager | head -3
-journalctl -u myapp -n 5 --no-pager
+systemctl is-active myapp
+journalctl -u myapp -n 4 --no-pager
 ```
 
-The log shows the process exiting and systemd starting it again after `RestartSec`.
+Output (example):
+
+```text
+active
+Sep 23 12:20:30 web01 systemd[1]: myapp.service: Failed with result 'signal'.
+Sep 23 12:20:35 web01 systemd[1]: myapp.service: Scheduled restart job, restart counter is at 1.
+Sep 23 12:20:35 web01 systemd[1]: Started myapp.service - My sample web app.
+Sep 23 12:20:35 web01 python3[2636]: listening on 8080
+```
+
+Now try `sudo pkill -f /opt/myapp/app.py` without `-9`. That sends `SIGTERM`, which systemd treats as a clean stop, so `Restart=on-failure` does **not** start it again and `systemctl is-active myapp` shows `inactive`. Start it with `sudo systemctl start myapp`. Use `Restart=always` if a service must come back even after a clean exit.
 
 ## Change a service without editing the original
 
@@ -255,10 +272,12 @@ The override is stored in `/etc/systemd/system/myapp.service.d/override.conf`. P
 ## Boot targets
 
 ```bash
-systemctl get-default            # usually multi-user.target on servers
+systemctl get-default            # graphical.target or multi-user.target
 systemctl list-dependencies multi-user.target | head
 systemd-analyze blame | head     # what slowed the boot
 ```
+
+Ubuntu cloud images report `graphical.target` even though no desktop is installed. It includes everything in `multi-user.target`, so both mean "normal server boot".
 
 ## Lab: Break the service and fix it
 

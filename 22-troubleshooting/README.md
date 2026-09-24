@@ -35,13 +35,15 @@ This chapter is a playbook. Each scenario lists what you see, the commands that 
 
 ## Cannot connect with SSH
 
+![Decision flow for SSH connection errors](../images/22-ssh-troubleshooting.png)
+
 **Symptoms:** `Connection timed out`, `Connection refused`, or `Permission denied (publickey)`.
 
 **Diagnose from your laptop:**
 
 ```bash
 ssh -v user@IP                  # read the last lines before the failure
-nc -zv IP 22                    # is the port reachable at all?
+nc -zv -w 3 IP 22               # is the port reachable at all?
 curl -s https://ifconfig.me     # has your own public IP changed?
 ```
 
@@ -91,6 +93,8 @@ Cloud tools that add keys or reset SSH: `az vm user update` / `az vm user reset-
 ---
 
 ## Server does not boot after an fstab change
+
+![Recovery ladder when a cloud VM does not come back after a reboot](../images/22-boot-recovery.png)
 
 **Symptoms:** VM starts but SSH never answers. Boot log shows:
 

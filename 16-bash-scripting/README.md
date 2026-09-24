@@ -153,18 +153,20 @@ esac
 ## Loops
 
 ```bash
-for svc in nginx ssh cron; do
-  printf '%-8s %s\n' "$svc" "$(systemctl is-active "$svc")"
+for svc in nginx ssh.socket cron; do
+  printf '%-11s %s\n' "$svc" "$(systemctl is-active "$svc")"
 done
 ```
 
 Output (example):
 
 ```text
-nginx    active
-ssh      active
-cron     active
+nginx       active
+ssh.socket  active
+cron        active
 ```
+
+On Ubuntu 24.04, check `ssh.socket`, not `ssh`: the SSH service is started on demand and can be `inactive` while SSH works (Chapter 09). On the Red Hat family, use `sshd`.
 
 Read a file line by line (the safe way):
 
@@ -276,7 +278,7 @@ Try them:
 
 ```bash
 chmod +x examples/*.sh
-./examples/health-check.sh nginx ssh
+./examples/health-check.sh nginx ssh.socket
 sudo ./examples/backup-dir.sh /etc /var/backups/etc 7
 ./examples/disk-alert.sh 80
 ```
@@ -288,14 +290,14 @@ Output of `health-check.sh` (example):
 2026-09-23T12:30:00+00:00 OK    memory 18% used
 2026-09-23T12:30:00+00:00 OK    / 11% used
 2026-09-23T12:30:00+00:00 OK    service nginx active
-2026-09-23T12:30:00+00:00 OK    service ssh active
+2026-09-23T12:30:00+00:00 OK    service ssh.socket active
 RESULT: healthy
 ```
 
 ## Lab: Automate a daily check
 
 1. Copy `health-check.sh` to `/usr/local/bin/health-check`.
-2. Create a systemd service and timer (Chapter 10) that run it every day at 07:00 with `nginx` and `ssh` as arguments.
+2. Create a systemd service and timer (Chapter 10) that run it every day at 07:00 with `nginx` and `ssh.socket` as arguments.
 3. Stop nginx and run the service manually: `sudo systemctl start health-check.service`.
 4. Confirm the failure appears in `journalctl -u health-check.service` and that `systemctl status` shows the unit as failed.
 5. Start nginx again and confirm the next run is healthy.

@@ -63,10 +63,10 @@ vmstat 1 5
 Output (example):
 
 ```text
-procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
- r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
- 4  0      0 212340  51200 5102300    0    0     5    40  900 1500 92  6  2  0  0
- 5  0      0 210900  51200 5102400    0    0     0    36  910 1520 94  5  1  0  0
+procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu
+ 4  0      0 212340  51200 5102300    0    0     5    40  900 1500 92  6  2  0  0  0
+ 5  0      0 210900  51200 5102400    0    0     0    36  910 1520 94  5  1  0  0  0
 ```
 
 | Column | Meaning | Warning sign |
@@ -77,6 +77,7 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 | `us` / `sy` | CPU in user / kernel code | `us` near 100: application busy |
 | `wa` | CPU idle waiting for I/O | Above ~10 to 20: disk bottleneck |
 | `st` | CPU stolen by the hypervisor | Above 0 on burstable VMs: out of CPU credits or noisy host |
+| `gu` | CPU running guest VMs (only on hosts that run VMs) | Ignore on cloud VMs |
 
 The first line is an average since boot. Read the lines after it.
 

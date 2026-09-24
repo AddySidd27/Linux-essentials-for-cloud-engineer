@@ -13,21 +13,7 @@ Cloud VMs configure themselves at first boot. **cloud-init** reads instructions 
 
 ## What happens at first boot
 
-```text
-VM starts
-  |
-cloud-init detects the cloud (Azure, AWS, GCP, ...)
-  |
-Reads metadata: hostname, SSH keys, network
-  |
-Reads your user data (cloud-config YAML or a shell script)
-  |
-Grows the root partition, sets hostname, creates users, adds SSH keys
-  |
-Installs packages, writes files, runs your commands
-  |
-Writes /var/lib/cloud/instance/boot-finished
-```
+![What cloud-init does on the first boot, and where to check it](../images/18-cloud-init.png)
 
 Most modules run only on the **first boot of an instance**. Rebooting does not run your user data again.
 

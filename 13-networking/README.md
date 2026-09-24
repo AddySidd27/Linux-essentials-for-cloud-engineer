@@ -13,19 +13,7 @@ Most "the server is down" tickets are network problems: a port not listening, a 
 
 ## The path of a request to a cloud VM
 
-```text
-Client
-  |
-Internet / VPN / peered network
-  |
-Cloud network rules  (Azure NSG, AWS security group + NACL, GCP firewall rule)
-  |
-VM network card      (eth0 / ens5, private IP only)
-  |
-Linux host firewall  (ufw, firewalld, nftables)
-  |
-Process listening on the port  (nginx on :80, sshd on :22)
-```
+![The layers a request passes through to reach a process on a cloud VM, and the command that tests each layer](../images/13-request-path.png)
 
 A request must pass **every** layer. When something fails, test from the inside out: first prove the process is listening, then the host firewall, then the cloud rules.
 
@@ -155,7 +143,7 @@ sudo lsof -i :80                   # which process uses port 80
 | Tool | Tests | Example |
 |---|---|---|
 | `curl` | HTTP/HTTPS end to end | `curl -v http://10.0.1.4/` |
-| `nc` (netcat) | Can a TCP port be reached | `nc -zv 10.0.1.20 5432` |
+| `nc` (netcat) | Can a TCP port be reached | `nc -zv -w 3 10.0.1.20 5432` |
 | `ping` | ICMP reachability | `ping -c 4 10.0.1.20` |
 | `traceroute` / `mtr` | Path and where it stops | `mtr -rwc 10 8.8.8.8` |
 | `openssl s_client` | TLS certificate and handshake | `openssl s_client -connect example.com:443 -servername example.com` |
@@ -171,14 +159,17 @@ Output:
 ```
 
 ```bash
-nc -zv 10.0.1.20 5432
+nc -zv -w 3 10.0.1.20 5432
 ```
 
-Output when open, and when blocked (examples):
+`-z` only tests the connection, `-v` prints the result, and `-w 3` gives up after 3 seconds. Without `-w`, a blocked port can hang for about two minutes.
+
+Output when open, when blocked, and when nothing listens (examples):
 
 ```text
 Connection to 10.0.1.20 5432 port [tcp/postgresql] succeeded!
-nc: connect to 10.0.1.20 port 5432 (tcp) failed: Connection timed out
+nc: connect to 10.0.1.20 port 5432 (tcp) timed out: Operation now in progress
+nc: connect to 10.0.1.20 port 5432 (tcp) failed: Connection refused
 ```
 
 How to read connection errors:

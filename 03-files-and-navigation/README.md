@@ -236,7 +236,7 @@ Output (last three commands, example):
 
 ```text
 logs/app-2.log  logs/app-3.log
--rw-r--r-- 1 azureuser azureuser 412 Sep 23 10:20 /home/azureuser/lab03-backup.tar.gz
+-rw-rw-r-- 1 azureuser azureuser 304 Sep 23 10:20 /home/azureuser/lab03-backup.tar.gz
 ```
 
 **Check yourself:** Why did `ls logs/*.log` not show `app-1.log.old`? (The pattern requires the name to end in `.log`.)

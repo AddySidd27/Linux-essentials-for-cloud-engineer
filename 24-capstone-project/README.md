@@ -6,17 +6,7 @@ Build a production-style Linux web server from nothing, on Azure, AWS, or Google
 
 A small web application, `myapp`, running behind nginx on a hardened Linux VM, with its data on a separate disk, monitored, backed up, and patched, and fully documented.
 
-```text
-Internet ──► Cloud firewall (80/443 from anywhere, 22 from your IP only or no SSH at all)
-                │
-            Linux VM (Ubuntu 24.04 or Rocky 9)
-                ├── nginx :80/:443  ──►  myapp :8080 (127.0.0.1 only, systemd, runs as "myapp")
-                ├── /data  (separate data disk, LVM, fstab by UUID, nofail)
-                ├── host firewall, fail2ban, key-only SSH, SELinux/AppArmor enforcing
-                ├── health check timer, disk alert, logrotate, journal limit
-                ├── nightly backup to cloud storage using the VM's identity
-                └── monitoring agent sending metrics and logs
-```
+![Capstone architecture: nginx and myapp on a hardened VM with a data disk, backups, monitoring and the cloud identity](../images/24-capstone.png)
 
 ## Requirements
 

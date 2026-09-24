@@ -25,7 +25,7 @@ Software on Linux is installed from **packages** that come from **repositories**
 | List installed | `apt list --installed` | `dnf list installed` |
 | Which package owns a file | `dpkg -S /usr/sbin/nginx` | `rpm -qf /usr/sbin/nginx` |
 | Files in a package | `dpkg -L nginx` | `rpm -ql nginx` |
-| Which package provides a command | `apt-file search bin/dig` (install `apt-file`) | `dnf provides '*/bin/dig'` |
+| Which package provides a command | `apt-file search --regexp 'bin/dig$'` (install `apt-file`, then `sudo apt-file update`) | `dnf provides '*/bin/dig'` |
 | Remove unused dependencies | `sudo apt autoremove` | `sudo dnf autoremove` |
 | History | `/var/log/apt/history.log` | `sudo dnf history` |
 

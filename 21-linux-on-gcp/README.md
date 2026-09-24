@@ -68,6 +68,10 @@ web01  us-central1-a  e2-small      10.128.0.5   34.123.45.67   RUNNING
 - Remove `--metadata-from-file` if you have no cloud-config yet (Chapter 18).
 - Other images: `--image-family rocky-linux-9 --image-project rocky-linux-cloud`, `--image-family debian-12 --image-project debian-cloud`. List them with `gcloud compute images list`.
 
+The finished lab after Steps 1 to 7 looks like this:
+
+![Google Cloud lab: project, VPC network, firewall rules by network tag, VM, disks, IAP and OS Login](../images/21-gcp-lab.png)
+
 ## Step 3: Connect
 
 **Option A: gcloud manages the key**

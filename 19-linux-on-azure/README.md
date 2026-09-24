@@ -65,6 +65,10 @@ What this created: a virtual network and subnet, a network security group (NSG) 
 
 **Portal:** Virtual machines > Create > Azure virtual machine. On the Networking tab, set **Public inbound ports** to None and add the rule below afterwards.
 
+The finished lab after Steps 1 to 7 looks like this:
+
+![Azure lab: resource group, virtual network, NSG, public IP, NIC, VM, disks, and the recovery tools](../images/19-azure-lab.png)
+
 ## Step 2: Allow SSH from your IP only
 
 ```bash
@@ -113,6 +117,7 @@ For production, remove public IPs and SSH through Azure Bastion. With the Standa
 
 ```bash
 az extension add -n bastion
+az extension add -n ssh            # bastion ssh needs this one too
 az network bastion ssh -g "$RG" -n my-bastion \
   --target-resource-id "$(az vm show -g "$RG" -n "$VM" --query id -o tsv)" \
   --auth-type ssh-key --username azureuser --ssh-key ~/.ssh/id_ed25519
@@ -304,7 +309,14 @@ The agent must reach `168.63.129.16`. Custom DNS, host firewalls, or proxy setti
 ## Monitoring
 
 - **Metrics** (CPU, disk, network) appear in the portal without an agent.
-- **Guest metrics and logs** (memory, disk space, syslog) need the **Azure Monitor Agent** and a **Data Collection Rule** sending to a Log Analytics workspace. Enable it from VM > Monitoring > Insights, or with `az vm extension set --name AzureMonitorLinuxAgent --publisher Microsoft.Azure.Monitor`.
+- **Guest metrics and logs** (memory, disk space, syslog) need the **Azure Monitor Agent** and a **Data Collection Rule** sending to a Log Analytics workspace. Enable it from VM > Monitoring > Insights, or install the agent from the CLI and then attach a Data Collection Rule in the portal:
+
+```bash
+az vm extension set -g "$RG" --vm-name "$VM" \
+  --name AzureMonitorLinuxAgent --publisher Microsoft.Azure.Monitor \
+  --enable-auto-upgrade true
+```
+
 - Patching at scale: **Azure Update Manager**.
 
 ## Step 9: Clean up

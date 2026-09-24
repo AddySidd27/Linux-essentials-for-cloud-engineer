@@ -37,6 +37,8 @@ Output (example):
 | `w` write | Change the contents | Create, delete, rename entries inside |
 | `x` execute | Run it as a program | Enter it (`cd`) and reach files inside |
 
+![How to read a permission string and its numeric value](../images/07-permissions.png)
+
 > To open `/var/www/html/index.html`, a user needs `x` on `/`, `/var`, `/var/www`, and `/var/www/html`, **and** `r` on the file. One missing `x` on a parent directory causes "Permission denied" even if the file itself is readable.
 
 ## Numeric (octal) mode
@@ -97,15 +99,25 @@ Here `html` is `drwxr-x---` and owned by `root:root`, so the `www-data` user (ng
 
 ```bash
 umask
+sudo bash -c umask
 ```
 
-Output:
+Output (normal user, then root):
 
 ```text
+0002
 0022
 ```
 
-New files start at `666` and directories at `777`, then the umask bits are removed. With `022`, files become `644` and directories `755`. A umask of `027` gives `640` and `750`, which keeps new files away from other users.
+New files start at `666` and directories at `777`, then the umask bits are removed:
+
+| umask | New files | New directories | Who gets it |
+|---|---|---|---|
+| `0002` | `664` (`rw-rw-r--`) | `775` | Normal users on Ubuntu and RHEL, because each user has a private group with the same name |
+| `0022` | `644` (`rw-r--r--`) | `755` | root and system accounts |
+| `0027` | `640` (`rw-r-----`) | `750` | Hardened servers that keep new files away from other users |
+
+Set a different default for your own shell by adding `umask 027` to `~/.bashrc`.
 
 ## Special bits
 
@@ -214,7 +226,7 @@ curl -s localhost
 Output of the error log (example):
 
 ```text
-... open() "/var/www/html/index.html" failed (13: Permission denied) ...
+... "/var/www/html/index.html" is forbidden (13: Permission denied), client: 127.0.0.1, server: _, request: "GET / HTTP/1.1" ...
 ```
 
 Final output:

@@ -13,17 +13,7 @@ In the cloud you will add data disks, grow disks that are full, and recover serv
 
 ## The layers
 
-```text
-Physical/virtual disk   /dev/sdc  or  /dev/nvme1n1
-        |
-Partition (optional)    /dev/sdc1 or  /dev/nvme1n1p1
-        |
-LVM (optional)          volume group -> logical volume /dev/datavg/datalv
-        |
-Filesystem              ext4 or xfs
-        |
-Mount point             /data
-```
+![Storage layers from disk to mount point, with and without LVM](../images/12-storage-layers.png)
 
 ## Find your disks
 

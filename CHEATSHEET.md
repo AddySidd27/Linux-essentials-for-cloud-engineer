@@ -89,7 +89,7 @@ ip route; ip route get 8.8.8.8
 resolvectl status; getent hosts name
 sudo ss -tulpn                                # listening ports and processes
 curl -sI http://localhost/
-nc -zv host 443
+nc -zv -w 3 host 443                          # test a TCP port, give up after 3 s
 sudo tcpdump -ni any port 80 -c 10
 sudo ufw status verbose                       # [sudo firewall-cmd --list-all]
 ```

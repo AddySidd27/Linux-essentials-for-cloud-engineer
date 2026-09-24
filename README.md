@@ -21,6 +21,8 @@ A practical guide to running Linux servers in Azure, AWS, and Google Cloud: crea
 
 No prior Linux knowledge is needed. Start at Chapter 01 and work in order. If you already know the basics, use the task map below to jump to what you need.
 
+![Learning path through the four parts of this guide](images/00-learning-path.png)
+
 ## Chapters
 
 ### Part 1: Foundations
@@ -99,6 +101,16 @@ Quick reference: [CHEATSHEET.md](CHEATSHEET.md)
 - Chapters 12 to 15 and 17 to 24 need a real VM. A small cloud VM (Azure `Standard_B2s`, AWS `t3.micro`, GCP `e2-small`) is enough.
 - Cloud resources cost money while they exist. Every cloud chapter ends with a **Clean up** section. Run it when you finish, and check your billing page.
 - Never open SSH to `0.0.0.0/0`. The labs show how to allow only your own IP address.
+
+## How this guide was tested
+
+- The Linux commands and labs in Chapters 01 to 17 and 22 to 23 were run on Ubuntu 24.04 LTS with systemd, and the example output was compared with the real output. Problems found during testing were fixed in the text. The exceptions are LVM logical volumes, XFS mounts and `auditd`, which the test machine's kernel did not support; their syntax was checked against the man pages.
+- The example scripts in Chapter 16 pass `shellcheck` and were run on Ubuntu 24.04.
+- The cloud-config in Chapter 18 passes `cloud-init schema` validation.
+- Every `az` and `aws` command was checked against the current Azure CLI and AWS CLI, including the extensions the guide uses, so options and syntax are correct.
+- `gcloud` commands and Red Hat family commands were checked against the official documentation but not run for this release.
+
+Cloud providers change their CLIs and defaults over time. If a command no longer works, check the provider's current documentation and open an issue.
 
 ## Safety
 

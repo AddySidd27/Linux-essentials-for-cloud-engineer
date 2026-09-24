@@ -19,6 +19,8 @@ Almost every virtual machine you create in Azure, AWS, or Google Cloud that is n
 | User-space tools | The commands you use every day. | `ls`, `cp`, `grep`, `ssh` |
 | Package manager | Installs, updates, and removes software. | `apt`, `dnf` |
 
+![The layers of a Linux server in the cloud](../images/01-linux-layers.png)
+
 A **distribution** (distro) is the kernel plus a chosen set of tools, a package manager, default settings, and a support lifecycle. Ubuntu, Red Hat Enterprise Linux (RHEL), and Amazon Linux are distributions.
 
 ## Distributions you will see in the cloud
@@ -172,7 +174,7 @@ You do not need to memorise options. Every tool documents itself.
 Example:
 
 ```bash
-man -k "disk usage"
+man -k "space usage"
 ```
 
 Output (example):

@@ -154,6 +154,11 @@ Output (example):
 	notifempty
 	create 0640 www-data adm
 	sharedscripts
+	prerotate
+		if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+			run-parts /etc/logrotate.d/httpd-prerotate; \
+		fi \
+	endscript
 	postrotate
 		invoke-rc.d nginx rotate >/dev/null 2>&1
 	endscript
@@ -167,7 +172,7 @@ Output (example):
 | `compress` / `delaycompress` | gzip old files, but leave the newest old file uncompressed |
 | `missingok` / `notifempty` | Do not complain if missing, skip if empty |
 | `create 0640 user group` | Permissions of the new log file |
-| `postrotate` | Command to run afterwards, usually to make the app reopen its log |
+| `prerotate` / `postrotate` | Commands to run before / after rotating, usually to make the app reopen its log |
 | `copytruncate` | Copy then empty the file, for apps that cannot reopen logs |
 
 Add rotation for your own application in `/etc/logrotate.d/myapp`:

@@ -84,6 +84,10 @@ echo "$INSTANCE_ID $IP"
 
 **Console:** EC2 > Instances > Launch instances.
 
+The finished lab after Steps 1 to 7 looks like this:
+
+![AWS lab: VPC, public subnet, security group, EC2 instance, EBS volumes, IAM role, and Systems Manager](../images/20-aws-lab.png)
+
 ## Step 4: Connect
 
 ```bash

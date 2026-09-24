@@ -14,13 +14,7 @@ SSH is how you reach every Linux server in the cloud. You use it to log in, copy
 
 ## How key authentication works
 
-```text
-Your laptop                               Server
------------                               ------
-~/.ssh/id_ed25519      (private key,      ~/.ssh/authorized_keys
-                        never leaves)       contains your PUBLIC key
-~/.ssh/id_ed25519.pub  (public key)  ---> (copied here once)
-```
+![How SSH key login works, and reaching a private server through a jump host](../images/14-ssh-keys.png)
 
 When you connect, the server checks that you hold the private key that matches a public key in `authorized_keys`. The private key is never sent.
 

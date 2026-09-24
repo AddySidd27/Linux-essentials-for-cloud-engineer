@@ -2,7 +2,7 @@
 # health-check.sh - basic health check for a Linux server.
 #
 # Usage: health-check.sh [service ...]
-# Example: health-check.sh nginx ssh
+# Example: health-check.sh nginx ssh.socket
 #
 # Checks load, memory, root disk usage, and the given systemd services.
 # Exit code: 0 = healthy, 1 = at least one check failed.
